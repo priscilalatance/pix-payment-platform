@@ -1,0 +1,22 @@
+services:
+  postgres-pagamento:
+    image: postgres:15-alpine
+    container_name: postgres-pagamento
+    environment:
+      POSTGRES_DB: db_pagamento
+      POSTGRES_USER: pagamento
+      POSTGRES_PASSWORD: pagamento123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata-pagamento:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+volumes:
+  pgdata-pagamento:
