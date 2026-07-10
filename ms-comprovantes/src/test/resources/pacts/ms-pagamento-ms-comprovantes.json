@@ -1,0 +1,194 @@
+{
+  "consumer": {
+    "name": "ms-pagamento"
+  },
+  "interactions": [
+    {
+      "description": "Requisi\u00E7\u00E3o para gerar comprovante",
+      "key": "caf6826",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "Comprovante pode ser gerado"
+        }
+      ],
+      "request": {
+        "body": {
+          "content": {
+            "chave_pix_destino": "11948755536",
+            "data_hora_transacao": "2022-04-10T20:03:57.116061100",
+            "digito_verificador_conta": "0",
+            "identificacao_pix": "Segue pagamento",
+            "nome": "Giovanni Vicente",
+            "nome_cliente_destino": "Fernando Augusto",
+            "numero_agencia": "2022",
+            "numero_conta": "00276",
+            "numero_documento": "50329291076",
+            "tipo_chave_pix_destino": "CELULAR",
+            "tipo_documento": "CPF",
+            "valor_transacao": 23.99
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$.chave_pix_destino": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.data_hora_transacao": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.digito_verificador_conta": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.identificacao_pix": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.nome": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.nome_cliente_destino": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.numero_agencia": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.numero_conta": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.numero_documento": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.tipo_chave_pix_destino": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.tipo_documento": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.valor_transacao": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "decimal"
+                }
+              ]
+            }
+          }
+        },
+        "method": "POST",
+        "path": "/comprovantes"
+      },
+      "response": {
+        "body": {
+          "content": {
+            "data_hora_requisicao": "2022-04-10T20:03:57.116061100",
+            "identificador_comprovante": "b819cc65-f6f0-478c-8bb7-69ee1c4f6402"
+          },
+          "contentType": "application/json",
+          "encoded": false
+        },
+        "headers": {
+          "Content-Type": [
+            "application/json"
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$.data_hora_requisicao": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.identificador_comprovante": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+                }
+              ]
+            }
+          }
+        },
+        "status": 202
+      },
+      "transport": "https",
+      "type": "Synchronous/HTTP"
+    }
+  ],
+  "metadata": {
+    "pact-jvm": {
+      "version": "4.6.7"
+    },
+    "pactSpecification": {
+      "version": "4.0"
+    }
+  },
+  "provider": {
+    "name": "ms-comprovantes"
+  }
+}
