@@ -1,0 +1,40 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:db_comprovantes_test
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  kafka:
+    bootstrap-servers: localhost:9092
+    admin:
+      fail-fast: false
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    properties:
+      request.timeout.ms: 2000
+      default.api.timeout.ms: 2000
+
+app:
+  rabbitmq:
+    listener:
+      auto-startup: false
+  cache:
+    comprovante:
+      ttl-minutes: 10
+  consulta:
+    max-tentativas: 3
+    delay-ms: 10

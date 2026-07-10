@@ -1,2 +1,17 @@
+# Build (Maven)
+target/
+
+# IDEs
 .idea/
-ms-pagamento/target/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Logs
+*.log
+
+# SO
+.DS_Store
+Thumbs.db
