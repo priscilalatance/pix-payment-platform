@@ -6,7 +6,7 @@ spring:
     name: ms-notificacao
 
   datasource:
-    url: jdbc:postgresql://localhost:5435/db_notificacao
+    url: jdbc:postgresql://localhost:5434/db_notificacao
     driver-class-name: org.postgresql.Driver
     username: notificacao
     password: notificacao123
