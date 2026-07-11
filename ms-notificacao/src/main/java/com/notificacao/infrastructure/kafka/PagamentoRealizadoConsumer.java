@@ -65,5 +65,17 @@ public class PagamentoRealizadoConsumer {
                 "Mensagem enviada para a DLT apos esgotar as tentativas: {}",
                 mensagem
         );
+
+        try {
+            PagamentoRealizadoEvent evento = objectMapper.readValue(mensagem, PagamentoRealizadoEvent.class);
+            notificacaoService.registrarFalha(evento, 4);
+            log.info("Mensagem persistida na DLT com status FALHA para o comprovante {}", evento.identificadorComprovante());
+        } catch (JsonProcessingException exception) {
+            log.error(
+                    "Payload invalido para persistencia na DLT e nao pode ser persistido: {}",
+                    mensagem,
+                    exception
+            );
+        }
     }
 }
