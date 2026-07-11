@@ -6,7 +6,10 @@ import com.notificacao.application.service.NotificacaoService;
 import com.notificacao.dto.PagamentoRealizadoEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.DltHandler;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.RetryableTopic;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,6 +20,15 @@ public class PagamentoRealizadoConsumer {
     private final ObjectMapper objectMapper;
     private final NotificacaoService notificacaoService;
 
+    @RetryableTopic(
+            attempts = "4",
+            backoff = @Backoff(
+                    delay = 1000,
+                    multiplier = 2.0,
+                    maxDelay = 4000
+            ),
+            dltTopicSuffix = "-dlt"
+    )
     @KafkaListener(
             topics = "${app.kafka.topic.pagamento-realizado}",
             groupId = "${spring.kafka.consumer.group-id}"
@@ -41,9 +53,17 @@ public class PagamentoRealizadoConsumer {
             );
 
             throw new IllegalArgumentException(
-                    "Mensagem Kafka inválida",
+                    "Mensagem Kafka invalida",
                     exception
             );
         }
+    }
+
+    @DltHandler
+    public void processarDlt(String mensagem) {
+        log.error(
+                "Mensagem enviada para a DLT apos esgotar as tentativas: {}",
+                mensagem
+        );
     }
 }
