@@ -7,19 +7,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * Corpo do GET /comprovantes/{id}. Tambem e o objeto guardado no cache Redis,
- * por isso implementa Serializable e usa apenas tipos simples (sem proxies JPA).
+ * Corpo do GET /comprovantes/{id}. Tambem e o objeto guardado no cache Redis
+ * (serializado como JSON via Jackson2JsonRedisSerializer), por isso usa apenas
+ * tipos simples (sem proxies JPA).
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ComprovanteConsultaResponse implements Serializable {
+public class ComprovanteConsultaResponse {
 
     @JsonProperty("identificador_comprovante")
     private String identificadorComprovante;
