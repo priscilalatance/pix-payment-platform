@@ -1,0 +1,49 @@
+package com.notificacao.infrastructure.kafka;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.notificacao.application.service.NotificacaoService;
+import com.notificacao.dto.PagamentoRealizadoEvent;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class PagamentoRealizadoConsumer {
+
+    private final ObjectMapper objectMapper;
+    private final NotificacaoService notificacaoService;
+
+    @KafkaListener(
+            topics = "${app.kafka.topic.pagamento-realizado}",
+            groupId = "${spring.kafka.consumer.group-id}"
+    )
+    public void consumir(String mensagem) {
+        try {
+            PagamentoRealizadoEvent evento =
+                    objectMapper.readValue(mensagem, PagamentoRealizadoEvent.class);
+
+            log.info(
+                    "Evento de pagamento recebido. Comprovante: {}",
+                    evento.identificadorComprovante()
+            );
+
+            notificacaoService.processar(evento);
+
+        } catch (JsonProcessingException exception) {
+            log.error(
+                    "Erro ao desserializar evento de pagamento: {}",
+                    mensagem,
+                    exception
+            );
+
+            throw new IllegalArgumentException(
+                    "Mensagem Kafka inválida",
+                    exception
+            );
+        }
+    }
+}

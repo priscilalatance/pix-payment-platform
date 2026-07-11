@@ -31,6 +31,12 @@
             <artifactId>spring-kafka</artifactId>
         </dependency>
 
+        <!-- Jackson/ObjectMapper para converter mensagens JSON do Kafka em DTOs Java -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-json</artifactId>
+        </dependency>
+
         <!-- Persistência -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
