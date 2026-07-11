@@ -27,10 +27,28 @@ public class NotificacaoService {
                 .dataEnvio(LocalDateTime.now())
                 .build();
 
+
         notificacaoRepository.save(notificacao);
 
-        log.info("Notificação enviada para {} — PIX de R$ {} realizado com sucesso",
+        log.info("Notificacao enviada para {} — PIX de R$ {} realizado com sucesso",
         evento.nome(),
         evento.valorTransacao());
+    }
+
+    public void registrarFalha(PagamentoRealizadoEvent evento, int tentativas) {
+        Notificacao notificacao = Notificacao.builder()
+                .identificadorComprovante(evento.identificadorComprovante())
+                .nomeDestinatario(evento.nome())
+                .valor(evento.valorTransacao())
+                .status(StatusNotificacao.FALHA)
+                .tentativas(tentativas)
+                .dataEnvio(null)
+                .build();
+
+        notificacaoRepository.save(notificacao);
+
+        log.error("Falha ao enviar notificacao para {} apos {} tentativas",
+                evento.nome(),
+                tentativas);
     }
 }
