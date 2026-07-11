@@ -1,3 +1,35 @@
+server:
+  port: 8082
+
 spring:
   application:
     name: ms-notificacao
+
+  datasource:
+    url: jdbc:postgresql://localhost:5435/db_notificacao
+    driver-class-name: org.postgresql.Driver
+    username: notificacao
+    password: notificacao123
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    consumer:
+      group-id: ms-notificacao-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+app:
+  kafka:
+    topic:
+      pagamento-realizado: pagamento.realizado
+      pagamento-realizado-dlt: pagamento.realizado-dlt
