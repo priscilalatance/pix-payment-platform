@@ -222,7 +222,6 @@ Antes de iniciar o microsserviço, instale:
 A infraestrutura compartilhada do projeto deve estar em execução, principalmente:
 
 - Kafka;
-- ZooKeeper;
 - PostgreSQL do `ms-notificacao`.
 
 ## Como executar

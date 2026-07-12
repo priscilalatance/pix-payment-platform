@@ -294,13 +294,13 @@ Tabela `comprovante`: `id` (UUID PK), dados do pagador, dados bancários, dados 
 - Maven 3.8+
 - Docker e Docker Compose
 
-### 1. Subir infraestrutura (PostgreSQL + Redis + Kafka + RabbitMQ)
+### 1. Subir infraestrutura
+
+> A infraestrutura é um **único `docker-compose.yml` na raiz do projeto** — todos os comandos `docker-compose` deste guia rodam a partir da raiz, não da pasta do serviço. Para subir só o que o ms-comprovantes usa: `docker-compose up -d postgres-comprovantes redis kafka rabbitmq`.
+
 ```bash
-cd ms-comprovantes
 docker-compose up -d
 ```
-
-> **Execução integrada com o ms-pagamento:** os dois módulos usam o RabbitMQ em `5672`. Suba **apenas um** RabbitMQ (o deste compose ou o do `ms-pagamento`), não os dois ao mesmo tempo.
 
 ### 2. Rodar a aplicação
 ```bash
