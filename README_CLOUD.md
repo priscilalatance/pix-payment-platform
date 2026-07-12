@@ -2,7 +2,7 @@
 
 Este documento descreve uma proposta prática para replicar, na AWS, a arquitetura local do projeto pix-payment-platform. O objetivo é mapear os componentes locais (três microsserviços Spring Boot, RabbitMQ, Redis, Kafka, PostgreSQL e Docker Compose) para serviços gerenciados na AWS, descrevendo onde executar os microsserviços, substituições gerenciadas, requisitos de rede e segurança, estratégias de escalabilidade e alta disponibilidade. Este é um plano técnico: não pressupõe que recursos foram criados ou testados na AWS.
 
-**Resumo das seções:** Introdução; Arquitetura atual; Arquitetura proposta na AWS; Mapeamento local→Cloud; Execução dos microsserviços; Rede e segurança; Amazon MQ (RabbitMQ); ElastiCache (Redis); MSK (Kafka); RDS (PostgreSQL); Escalabilidade; Alta disponibilidade e resiliência; Observabilidade; Diagrama (Mermaid); Fluxo de implantação; Custos e decisões; Conclusão; Referências.
+**Resumo das seções:** Introdução; Arquitetura atual; Arquitetura proposta na AWS; Mapeamento local→Cloud; Execução dos microsserviços; Rede e segurança; Amazon MQ (RabbitMQ); ElastiCache (Redis); MSK (Kafka); RDS (PostgreSQL); Escalabilidade; Alta disponibilidade e resiliência; Observabilidade; Diagrama; Fluxo de implantação; Custos e decisões; Conclusão; Referências.
 
 ---
 
@@ -180,47 +180,9 @@ Diferenças importantes: retry da aplicação ( lógica de reexecução/DSL ), a
 
 ---
 
-## 14. Diagrama (Mermaid)
+## 14. Diagrama com arquitetura proposta na AWS
 
-```mermaid
-flowchart LR
-  subgraph Internet
-    Client[Cliente]
-  end
-
-  subgraph VPC_Private[ VPC (públicas + privadas) ]
-    ALB[Application Load Balancer]
-    subgraph ECS[Fargate - ECS]
-      MP[ms-pagamento]
-      MC[ms-comprovantes]
-      MN[ms-notificacao]
-    end
-    MQ[Amazon MQ (RabbitMQ)]
-    EC[ElastiCache Redis]
-    MSK[Amazon MSK (Kafka)]
-    R1[(RDS ms-pagamento)]
-    R2[(RDS ms-comprovantes)]
-    R3[(RDS ms-notificacao)]
-    CW[CloudWatch]
-  end
-
-  Client -->|HTTPS| ALB
-  ALB --> MP
-  MP -->|HTTP| MC
-  MP -->|publish/consume| MQ
-  MC -->|cache| EC
-  MC -->|publish pagamento.realizado| MSK
-  MN -->|consume pagamento.realizado| MSK
-  MP --> R1
-  MC --> R2
-  MN --> R3
-  MQ --> CW
-  MSK --> CW
-  EC --> CW
-  R1 --> CW
-  R2 --> CW
-  R3 --> CW
-```
+![Arquitetura proposta na AWS](docs/arch/images/arquitetura-cloud.svg)
 
 ---
 
@@ -238,7 +200,7 @@ flowchart LR
 
 ---
 
-## 16. Custos e decisões arquiteturais (crítica curta)
+## 16. Custos e decisões arquiteturais
 
 - Serviços gerenciados reduzem esforço operacional e tempo de entrega, mas aumentam custo fixo — Amazon MSK, Amazon MQ e configurações Multi-AZ contribuem significativamente para custos.
 - Para ambientes de desenvolvimento/staging, considere configurações reduzidas (menos brokers, uma instância RDS com múltiplos bancos) e sem Multi-AZ para economizar custos.
