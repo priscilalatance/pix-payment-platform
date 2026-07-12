@@ -18,6 +18,13 @@ public class NotificacaoService {
     private final NotificacaoRepository notificacaoRepository;
 
     public void processar(PagamentoRealizadoEvent evento) {
+        // Idempotencia: protege contra redelivery/retry do Kafka
+        if (notificacaoRepository.existsByIdentificadorComprovante(evento.identificadorComprovante())) {
+            log.warn("Notificacao do comprovante {} ja processada. Ignorando mensagem duplicada.",
+                    evento.identificadorComprovante());
+            return;
+        }
+
         Notificacao notificacao = Notificacao.builder()
                 .identificadorComprovante(evento.identificadorComprovante())
                 .nomeDestinatario(evento.nome())
