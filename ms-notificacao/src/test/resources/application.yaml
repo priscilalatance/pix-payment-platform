@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:db_notificacao_test
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  kafka:
+    bootstrap-servers: localhost:9092
+    admin:
+      fail-fast: false
+      auto-create: false
+    consumer:
+      group-id: ms-notificacao-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      auto-startup: false
+    properties:
+      request.timeout.ms: 2000
+      default.api.timeout.ms: 2000
+
+app:
+  kafka:
+    topic:
+      pagamento-realizado: pagamento.realizado
+      pagamento-realizado-dlt: pagamento.realizado-dlt

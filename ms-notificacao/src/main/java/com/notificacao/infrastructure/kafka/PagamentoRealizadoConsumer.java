@@ -27,7 +27,9 @@ public class PagamentoRealizadoConsumer {
                     multiplier = 2.0,
                     maxDelay = 4000
             ),
-            dltTopicSuffix = "-dlt"
+            dltTopicSuffix = "-dlt",
+            // Erro de desserializacao nao e transitorio: vai direto para a DLT, sem retentar.
+            exclude = { IllegalArgumentException.class }
     )
     @KafkaListener(
             topics = "${app.kafka.topic.pagamento-realizado}",
