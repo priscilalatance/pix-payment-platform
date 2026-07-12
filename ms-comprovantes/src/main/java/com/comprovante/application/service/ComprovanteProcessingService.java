@@ -28,17 +28,28 @@ public class ComprovanteProcessingService {
             return;
         }
 
+        // So a falha da GRAVACAO deve compensar a SAGA (FALHA).
         try {
             persistenceService.gravar(message);
             log.info("Comprovante {} gravado no banco", identificador);
-
-            // Avisa o ms-pagamento (SAGA) e o ms-notificacao (Kafka)
-            sagaCallbackPublisher.sucesso(identificador);
-            pagamentoEventPublisher.publicar(construirEvento(message));
-
         } catch (Exception e) {
             log.error("Falha ao gravar comprovante {}: {}", identificador, e.getMessage());
             sagaCallbackPublisher.falha(identificador, e.getMessage());
+            return;
+        }
+
+        // Gravado com sucesso: avisa o ms-pagamento (SAGA) e o ms-notificacao (Kafka).
+        // O evento Kafka e best-effort e NAO deve disparar compensacao depois do SUCESSO.
+        sagaCallbackPublisher.sucesso(identificador);
+        publicarEventoKafka(message);
+    }
+
+    private void publicarEventoKafka(ComprovanteMessage message) {
+        try {
+            pagamentoEventPublisher.publicar(construirEvento(message));
+        } catch (Exception e) {
+            log.error("Falha ao publicar evento Kafka para comprovante {} (notificacao best-effort): {}",
+                    message.getIdentificadorComprovante(), e.getMessage());
         }
     }
 

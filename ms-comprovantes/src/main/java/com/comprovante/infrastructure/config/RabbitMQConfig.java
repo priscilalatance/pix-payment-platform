@@ -22,11 +22,11 @@ public class RabbitMQConfig {
     public static final String COMPROVANTE_GERAR_QUEUE = "comprovante.gerar";
     public static final String COMPROVANTE_ROUTING_KEY = "comprovante.routing-key";
 
-    // Callback da SAGA (producer -> consumido pelo ms-pagamento).
+    // Callback da SAGA: este servico apenas PUBLICA no saga.exchange; as filas
+    // saga.comprovante.sucesso/falha e seus bindings sao declarados/consumidos pelo
+    // ms-pagamento. Aqui bastam o exchange e as routing keys usadas pelo publisher.
     // Constantes devem bater com o RabbitMQConfig do ms-pagamento.
     public static final String SAGA_EXCHANGE = "saga.exchange";
-    public static final String SAGA_SUCESSO_QUEUE = "saga.comprovante.sucesso";
-    public static final String SAGA_FALHA_QUEUE = "saga.comprovante.falha";
     public static final String SAGA_SUCESSO_ROUTING_KEY = "saga.sucesso.routing-key";
     public static final String SAGA_FALHA_ROUTING_KEY = "saga.falha.routing-key";
 
@@ -46,30 +46,10 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(comprovanteGerarQueue).to(comprovanteExchange).with(COMPROVANTE_ROUTING_KEY);
     }
 
-    // ---- saga.exchange (declarado tambem aqui; declaracoes sao idempotentes) ----
+    // ---- saga.exchange (declarado para o publisher; as filas/bindings sao do ms-pagamento) ----
     @Bean
     public DirectExchange sagaExchange() {
         return new DirectExchange(SAGA_EXCHANGE);
-    }
-
-    @Bean
-    public Queue sagaSucessoQueue() {
-        return QueueBuilder.durable(SAGA_SUCESSO_QUEUE).build();
-    }
-
-    @Bean
-    public Queue sagaFalhaQueue() {
-        return QueueBuilder.durable(SAGA_FALHA_QUEUE).build();
-    }
-
-    @Bean
-    public Binding sagaSucessoBinding(Queue sagaSucessoQueue, DirectExchange sagaExchange) {
-        return BindingBuilder.bind(sagaSucessoQueue).to(sagaExchange).with(SAGA_SUCESSO_ROUTING_KEY);
-    }
-
-    @Bean
-    public Binding sagaFalhaBinding(Queue sagaFalhaQueue, DirectExchange sagaExchange) {
-        return BindingBuilder.bind(sagaFalhaQueue).to(sagaExchange).with(SAGA_FALHA_ROUTING_KEY);
     }
 
     // ---- infra ----

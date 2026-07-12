@@ -75,6 +75,21 @@ class ComprovanteProcessingServiceTest {
     }
 
     @Test
+    void naoDevePublicarFalhaQuandoApenasKafkaFalha() {
+        // Kafka e best-effort: sua falha nao deve gerar callback FALHA apos o SUCESSO ja publicado.
+        ComprovanteMessage message = novaMensagem();
+        when(persistenceService.existe(any(UUID.class))).thenReturn(false);
+        doThrow(new RuntimeException("kafka fora do ar"))
+                .when(pagamentoEventPublisher).publicar(any(PagamentoRealizadoEvent.class));
+
+        processingService.processar(message);
+
+        verify(persistenceService).gravar(message);
+        verify(sagaCallbackPublisher).sucesso(message.getIdentificadorComprovante());
+        verify(sagaCallbackPublisher, never()).falha(anyString(), anyString());
+    }
+
+    @Test
     void deveIgnorarMensagemQuandoComprovanteJaExiste() {
         ComprovanteMessage message = novaMensagem();
         when(persistenceService.existe(any(UUID.class))).thenReturn(true);
