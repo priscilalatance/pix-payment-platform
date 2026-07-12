@@ -311,9 +311,11 @@ CREATE TABLE pagamentos (
 - Maven 3.8+
 - Docker e Docker Compose
 
-### 1. Subir infraestrutura (PostgreSQL + RabbitMQ)
+### 1. Subir infraestrutura
+
+> A infraestrutura é um **único `docker-compose.yml` na raiz do projeto** — todos os comandos `docker-compose` deste guia rodam a partir da raiz, não da pasta do serviço. Para subir só o que o ms-pagamento usa: `docker-compose up -d postgres-pagamento rabbitmq`.
+
 ```bash
-cd ms-pagamento
 docker-compose up -d
 ```
 
@@ -321,7 +323,7 @@ Verifique se subiu:
 ```bash
 docker ps
 ```
-Deve mostrar `postgres-pagamento` e `rabbitmq` rodando.
+Deve mostrar (entre outros) `postgres-pagamento` e `rabbitmq` rodando.
 
 ### 2. Rodar a aplicação
 ```bash
@@ -597,8 +599,7 @@ Quando o MS Comprovantes (Pessoa 2) estiver pronto e rodando na porta 8081, o fl
 ### Passo 1 — Subir infraestrutura e ambos os microsserviços
 
 ```bash
-# Terminal 1: infra
-cd ms-pagamento
+# Terminal 1: infra (na raiz do projeto)
 docker-compose up -d
 
 # Terminal 2: MS Pagamento

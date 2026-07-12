@@ -85,6 +85,15 @@ class ComprovanteConsultaServiceTest {
     }
 
     @Test
+    void deveLancar404QuandoIdNaoForUuidValido() {
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get("comprovante:nao-e-uuid")).thenReturn(null);
+
+        assertThrows(ComprovanteNaoEncontradoException.class, () -> consultaService.consultar("nao-e-uuid"));
+        verify(comprovanteRepository, never()).findById(any());
+    }
+
+    @Test
     void deveLancar404AposTresTentativasSemEncontrar() {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(cacheKey)).thenReturn(null);

@@ -161,13 +161,13 @@ Consulta um comprovante pelo identificador (UUID). Fluxo: **cache Redis → banc
 ```
 1. Recebe ComprovanteMessage
 2. Idempotência: se o comprovante já existe → ignora (protege contra redelivery)
-3. try:
-     - grava Comprovante no banco (@Transactional)
-     - publica saga.comprovante.sucesso  → MS Pagamento marca fatura PAGA
-     - publica evento Kafka pagamento.realizado → MS Notificação
-   catch:
-     - publica saga.comprovante.falha → MS Pagamento marca fatura FALHA
-4. ack (sem requeue)
+3. grava Comprovante no banco (@Transactional)
+     - falha na gravação → publica saga.comprovante.falha → MS Pagamento marca fatura FALHA; encerra
+4. gravou com sucesso:
+     - publica saga.comprovante.sucesso → MS Pagamento marca fatura PAGA
+     - publica evento Kafka pagamento.realizado → MS Notificação (best-effort:
+       falha do Kafka só é logada, NÃO dispara compensação depois do SUCESSO)
+5. ack (sem requeue)
 ```
 
 ### GET (cache + retry)
@@ -261,10 +261,10 @@ O `ms-pagamento` (consumer) gera o contrato; este serviço (provider) o verifica
 | Classe | Testes | Cobertura |
 |--------|:------:|-----------|
 | ComprovanteControllerTest | 5 | POST 202, POST 400 (2x), GET 200, GET 404 |
-| ComprovanteProcessingServiceTest | 3 | grava+sucesso+kafka, falha→compensação, idempotência |
-| ComprovanteConsultaServiceTest | 3 | cache hit, miss→banco→cacheia, 404 após 3 tentativas |
+| ComprovanteProcessingServiceTest | 4 | grava+sucesso+kafka, falha→compensação, idempotência, falha do Kafka não compensa |
+| ComprovanteConsultaServiceTest | 4 | cache hit, miss→banco→cacheia, 404 após 3 tentativas, UUID inválido→404 |
 | ComprovanteProviderPactTest | 1 | Contrato PACT provider |
-| **Total** | **12** | |
+| **Total** | **14** | |
 
 Rodar (com JDK 17):
 ```bash
@@ -294,13 +294,13 @@ Tabela `comprovante`: `id` (UUID PK), dados do pagador, dados bancários, dados 
 - Maven 3.8+
 - Docker e Docker Compose
 
-### 1. Subir infraestrutura (PostgreSQL + Redis + Kafka + RabbitMQ)
+### 1. Subir infraestrutura
+
+> A infraestrutura é um **único `docker-compose.yml` na raiz do projeto** — todos os comandos `docker-compose` deste guia rodam a partir da raiz, não da pasta do serviço. Para subir só o que o ms-comprovantes usa: `docker-compose up -d postgres-comprovantes redis kafka rabbitmq`.
+
 ```bash
-cd ms-comprovantes
 docker-compose up -d
 ```
-
-> **Execução integrada com o ms-pagamento:** os dois módulos usam o RabbitMQ em `5672`. Suba **apenas um** RabbitMQ (o deste compose ou o do `ms-pagamento`), não os dois ao mesmo tempo.
 
 ### 2. Rodar a aplicação
 ```bash
@@ -309,7 +309,7 @@ mvn spring-boot:run
 
 ### 3. Rodar testes
 ```bash
-mvn test    # 12 testes
+mvn test    # 14 testes
 ```
 
 ### 4. Parar infraestrutura
